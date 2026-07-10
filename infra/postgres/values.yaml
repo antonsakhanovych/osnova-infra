@@ -1,0 +1,10 @@
+fullnameOverride: "osnova-db"
+
+auth:
+  database: "postgres"
+
+primary:
+  persistence:
+    enabled: true
+    storageClass: "local-path"
+    size: 8Gi
