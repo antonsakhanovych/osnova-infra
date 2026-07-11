@@ -1,0 +1,10 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: DatabaseRole
+metadata:
+  name: keycloak
+  namespace: database
+spec:
+  cluster:
+    name: osnova-db
+  name: keycloak
+  login: true

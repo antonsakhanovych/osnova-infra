@@ -1,0 +1,14 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: osnova-db
+  namespace: database
+spec:
+  instances: 1
+  storage:
+    size: 8Gi
+    storageClass: local-path
+  bootstrap:
+    initdb:
+      database: postgres
+      owner: postgres
