@@ -19,6 +19,8 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       kind: Deployment
       replicaCount: 1
+      service:
+        type: ClusterIP
       ingressClassResource:
         default: true
       resources:
