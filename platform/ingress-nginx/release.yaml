@@ -15,12 +15,10 @@ spec:
         namespace: flux-system
   values:
     controller:
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
       kind: Deployment
       replicaCount: 1
       service:
-        type: ClusterIP
+        type: LoadBalancer
       ingressClassResource:
         default: true
       resources:
