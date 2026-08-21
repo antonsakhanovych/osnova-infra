@@ -1,0 +1,73 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authelia
+  namespace: authelia
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: authelia
+      version: "0.11.6"
+      sourceRef:
+        kind: HelmRepository
+        name: authelia
+        namespace: flux-system
+  values:
+    pod:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
+      env:
+        - name: AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE
+          value: /secrets/db/password
+      extraVolumes:
+        - name: db-password
+          secret:
+            secretName: authelia-db-credentials
+        - name: users-database
+          secret:
+            secretName: authelia-users-database
+      extraVolumeMounts:
+        - name: db-password
+          mountPath: /secrets/db
+          readOnly: true
+        - name: users-database
+          mountPath: /config/users_database.yml
+          subPath: users_database.yml
+          readOnly: true
+    persistence:
+      enabled: true
+    ingress:
+      enabled: false
+    configMap:
+      authentication_backend:
+        file:
+          enabled: true
+      storage:
+        postgres:
+          enabled: true
+          address: 'tcp://osnova-db-rw.database.svc.cluster.local:5432'
+          database: authelia
+          username: authelia
+          password:
+            disabled: true
+      session:
+        cookies:
+          - subdomain: auth
+            domain: osnova.antonsakhanovych.com
+      access_control:
+        default_policy: deny
+        rules:
+          - domain:
+              - osnova.antonsakhanovych.com
+              - '*.osnova.antonsakhanovych.com'
+            policy: one_factor
+      notifier:
+        filesystem:
+          enabled: true
