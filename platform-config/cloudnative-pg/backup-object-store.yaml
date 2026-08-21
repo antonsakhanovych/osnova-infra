@@ -1,0 +1,17 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: osnova-db-backups
+  namespace: database
+spec:
+  configuration:
+    destinationPath: "s3://osnova-backups/osnova-db"
+    endpointURL: "https://12130ffc4c0c22e0959e4990a42177ff.r2.cloudflarestorage.com"
+    s3Credentials:
+      accessKeyId:
+        name: db-backup-object-store
+        key: access_key_id
+      secretAccessKey:
+        name: db-backup-object-store
+        key: secret_access_key
+  retentionPolicy: "30d"
