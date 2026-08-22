@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lldap
+  namespace: lldap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lldap
+  template:
+    metadata:
+      labels:
+        app: lldap
+    spec:
+      containers:
+        - name: lldap
+          image: lldap/lldap:v0.6.3
+          ports:
+            - name: ldap
+              containerPort: 3890
+            - name: http
+              containerPort: 17170
+          env:
+            - name: LLDAP_LDAP_BASE_DN
+              value: "dc=osnova,dc=antonsakhanovych,dc=com"
+            - name: LLDAP_HTTP_URL
+              value: "https://accounts.osnova.antonsakhanovych.com"
+            - name: LLDAP_LDAP_USER_DN
+              value: "admin"
+            - name: LLDAP_LDAP_USER_PASS_FILE
+              value: "/secrets/admin/password"
+            - name: LLDAP_JWT_SECRET_FILE
+              value: "/secrets/admin/jwt_secret"
+            - name: LLDAP_KEY_SEED
+              valueFrom:
+                secretKeyRef:
+                  name: lldap-admin-credentials
+                  key: key_seed
+            - name: LLDAP_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: lldap-database-url
+                  key: database_url
+          volumeMounts:
+            - name: admin-credentials
+              mountPath: /secrets/admin
+              readOnly: true
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: admin-credentials
+          secret:
+            secretName: lldap-admin-credentials
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lldap
+  namespace: lldap
+spec:
+  selector:
+    app: lldap
+  ports:
+    - name: ldap
+      port: 3890
+      targetPort: 3890
+    - name: http
+      port: 17170
+      targetPort: 17170

@@ -30,20 +30,21 @@ spec:
       env:
         - name: AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE
           value: /secrets/db/password
+        - name: AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE
+          value: /secrets/ldap/password
       extraVolumes:
         - name: db-password
           secret:
             secretName: authelia-db-credentials
-        - name: users-database
+        - name: ldap-password
           secret:
-            secretName: authelia-users-database
+            secretName: lldap-bind-credentials
       extraVolumeMounts:
         - name: db-password
           mountPath: /secrets/db
           readOnly: true
-        - name: users-database
-          mountPath: /config/users_database.yml
-          subPath: users_database.yml
+        - name: ldap-password
+          mountPath: /secrets/ldap
           readOnly: true
     persistence:
       enabled: true
@@ -51,8 +52,14 @@ spec:
       enabled: false
     configMap:
       authentication_backend:
-        file:
+        ldap:
           enabled: true
+          implementation: lldap
+          address: 'ldap://lldap.lldap.svc.cluster.local:3890'
+          base_dn: 'dc=osnova,dc=antonsakhanovych,dc=com'
+          user: 'cn=admin,ou=people,dc=osnova,dc=antonsakhanovych,dc=com'
+          password:
+            disabled: true
       storage:
         postgres:
           enabled: true
