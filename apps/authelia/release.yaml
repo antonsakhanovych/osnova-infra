@@ -61,6 +61,8 @@ spec:
           username: authelia
           password:
             disabled: true
+      webauthn:
+        enable_passkey_login: true
       session:
         cookies:
           - subdomain: auth
